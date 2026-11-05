@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "599077088911",
+    "project_id": "campus-incident-reporter-7204c",
+    "storage_bucket": "campus-incident-reporter-7204c.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:599077088911:android:7ecc8466caa732ae21cafa",
+        "android_client_info": {
+          "package_name": "com.example.campus_incident_reporter"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCGdgcc2YprLsPJbJOQn5bB8cDfZsetA8w"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
