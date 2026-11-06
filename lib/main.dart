@@ -6,6 +6,8 @@ import 'firebase_options.dart';
 import 'providers/auth_provider.dart';
 import 'providers/incident_provider.dart';
 import 'theme/app_theme.dart';
+import 'screens/login_screen.dart';
+import 'screens/verify_email_screen.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -42,12 +44,25 @@ class AuthGate extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final auth = context.watch<AuthProvider>();
-    final text = switch (auth.status) {
-      AuthStatus.loading => 'Loading…',
-      AuthStatus.signedOut => 'Signed out',
-      AuthStatus.unverified => 'Check your email',
-      AuthStatus.signedIn => 'Hi ${auth.user!.name}',
+    return switch (auth.status) {
+      AuthStatus.loading => const Scaffold(
+        body: Center(child: CircularProgressIndicator()),
+      ),
+      AuthStatus.signedOut => const LoginScreen(),
+      AuthStatus.unverified => const VerifyEmailScreen(),
+      AuthStatus.signedIn => Scaffold(
+        body: Center(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextButton(
+                onPressed: auth.signOut,
+                child: const Text('Sign out'),
+              ),
+            ],
+          ),
+        ),
+      ),
     };
-    return Scaffold(body: Center(child: Text(text)));
   }
 }
