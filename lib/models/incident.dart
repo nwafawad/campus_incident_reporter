@@ -40,7 +40,9 @@ class Incident {
     this.anonymous = false,
     this.affectedBy = const [],
     DateTime? createdAt,
-  }) : createdAt = createdAt ?? DateTime.now();
+    DateTime? updatedAt,
+  }) : createdAt = createdAt ?? DateTime.now(),
+       updatedAt = updatedAt ?? DateTime.now();
 
   final String id;
   final String title;
@@ -57,6 +59,7 @@ class Incident {
   final bool anonymous;
   final List<String> affectedBy;
   final DateTime createdAt;
+  final DateTime updatedAt;
 
   // Students can edit or delete only while staff haven't started.
   bool get isLocked => status != IncidentStatus.submitted;
@@ -93,6 +96,7 @@ class Incident {
     anonymous: map['anonymous'] ?? false,
     affectedBy: List<String>.from(map['affectedBy'] ?? []),
     createdAt: _date(map['createdAt']),
+    updatedAt: _date(map['updatedAt']),
   );
 }
 
