@@ -8,6 +8,7 @@ import 'providers/incident_provider.dart';
 import 'theme/app_theme.dart';
 import 'screens/login_screen.dart';
 import 'screens/verify_email_screen.dart';
+import 'screens/main_shell.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -50,19 +51,7 @@ class AuthGate extends StatelessWidget {
       ),
       AuthStatus.signedOut => const LoginScreen(),
       AuthStatus.unverified => const VerifyEmailScreen(),
-      AuthStatus.signedIn => Scaffold(
-        body: Center(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextButton(
-                onPressed: auth.signOut,
-                child: const Text('Sign out'),
-              ),
-            ],
-          ),
-        ),
-      ),
+      AuthStatus.signedIn => const MainShell(),
     };
   }
 }
