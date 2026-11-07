@@ -1,0 +1,104 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    // Staff by email domain. Demo account: remove before real use (also in constants.dart).
+    function staffEmail() {
+      return request.auth.token.email.matches('.*@alueducation[.]com$')
+        || request.auth.token.email == 'nwafawad49@gmail.com';
+    }
+
+    function aluEmail() {
+      return request.auth.token.email.matches('.*@alustudent[.]com$') || staffEmail();
+    }
+
+    // Read from the sign-in token, which can't be faked (unlike the role field).
+    function verified() {
+      return signedIn() && request.auth.token.email_verified == true && aluEmail();
+    }
+
+    function isStaff() {
+      return verified() && staffEmail();
+    }
+
+    // True if the update only touches these fields.
+    function changesOnly(fields) {
+      return request.resource.data.diff(resource.data).affectedKeys().hasOnly(fields);
+    }
+
+    function validStatus(s) {
+      return s in ['submitted', 'inProgress', 'resolved', 'notActionable'];
+    }
+
+    function validReport(d) {
+      return d.title is string && d.title.size() > 0 && d.title.size() <= 60
+        && d.description is string && d.description.size() > 0 && d.description.size() <= 500
+        && d.urgency in ['low', 'medium', 'high']
+        && d.photoUrls.size() <= 3;
+    }
+
+    // Users 
+    match /users/{uid} {
+      allow read: if (signedIn() && request.auth.uid == uid) || isStaff();
+
+      // Created at sign-up (before verification). Role must match the email.
+      allow create: if signedIn() && request.auth.uid == uid
+        && request.resource.data.email == request.auth.token.email
+        && ((staffEmail() && request.resource.data.role == 'staff')
+            || (!staffEmail() && request.resource.data.role == 'student'));
+
+      // Users can only change their "hide my name" preference.
+      allow update: if signedIn() && request.auth.uid == uid
+        && changesOnly(['hideNameByDefault']);
+    }
+
+    // Reports 
+    match /incidents/{id} {
+      allow read: if verified();
+
+      allow create: if verified()
+        && request.resource.data.reporterId == request.auth.uid
+        && request.resource.data.status == 'submitted'
+        && request.resource.data.affectedBy == [request.auth.uid]
+        && validReport(request.resource.data);
+
+      allow update: if verified() && (
+        // 1. Reporter edits, only while still Submitted
+        (resource.data.reporterId == request.auth.uid
+          && resource.data.status == 'submitted'
+          && changesOnly(['title', 'description', 'category', 'urgency', 'zone', 'area',
+                          'landmark', 'photoUrls', 'anonymous', 'updatedAt'])
+          && validReport(request.resource.data))
+        ||
+        // 2. "Me too": add or remove only your own ID
+        (changesOnly(['affectedBy']) && onlyOwnIdChanged())
+        ||
+        // 3. Staff change the status
+        (isStaff() && changesOnly(['status', 'updatedAt'])
+          && validStatus(request.resource.data.status))
+      );
+
+      allow delete: if verified()
+        && resource.data.reporterId == request.auth.uid
+        && resource.data.status == 'submitted';
+
+      function onlyOwnIdChanged() {
+        let before = resource.data.affectedBy.toSet();
+        let after = request.resource.data.affectedBy.toSet();
+        return after.difference(before).hasOnly([request.auth.uid])
+          && before.difference(after).hasOnly([request.auth.uid]);
+      }
+
+      // Status timeline: everyone can read, only staff can add.
+      match /updates/{updateId} {
+        allow read: if verified();
+        allow create: if isStaff() && validStatus(request.resource.data.status);
+      }
+    }
+  }
+}

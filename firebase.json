@@ -1,1 +1,28 @@
-{"flutter":{"platforms":{"android":{"default":{"projectId":"campus-incident-reporter-7204c","appId":"1:599077088911:android:7ecc8466caa732ae21cafa","fileOutput":"android/app/google-services.json"}},"dart":{"lib/firebase_options.dart":{"projectId":"campus-incident-reporter-7204c","configurations":{"android":"1:599077088911:android:7ecc8466caa732ae21cafa","web":"1:599077088911:web:8c1a681589a1ce8621cafa"}}}}}}
+{
+  "flutter": {
+    "platforms": {
+      "android": {
+        "default": {
+          "projectId": "campus-incident-reporter-7204c",
+          "appId": "1:599077088911:android:7ecc8466caa732ae21cafa",
+          "fileOutput": "android/app/google-services.json"
+        }
+      },
+      "dart": {
+        "lib/firebase_options.dart": {
+          "projectId": "campus-incident-reporter-7204c",
+          "configurations": {
+            "android": "1:599077088911:android:7ecc8466caa732ae21cafa",
+            "web": "1:599077088911:web:8c1a681589a1ce8621cafa"
+          }
+        }
+      }
+    }
+  },
+  "firestore": {
+    "database": "(default)",
+    "location": "nam5",
+    "rules": "firestore.rules",
+    "indexes": "firestore.indexes.json"
+  }
+}
