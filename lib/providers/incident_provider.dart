@@ -21,9 +21,13 @@ class IncidentProvider extends ChangeNotifier {
 
   // Starts listening to reports once a user signs in.
   void start(String? newUid) {
-    if (newUid == null || newUid == uid) return;
+    if (newUid == uid) return;
     uid = newUid;
     _sub?.cancel();
+    _sub = null;
+    all = [];
+    loading = true;
+    if (newUid == null) return;
     _sub = _service.watchAll().listen((list) {
       all = list;
       loading = false;
